@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: transaction-webhook-service
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        sync: false
