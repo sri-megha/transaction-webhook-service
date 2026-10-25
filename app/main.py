@@ -1,7 +1,8 @@
 import logging
+import time
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Request, status
 from sqlalchemy.exc import IntegrityError
 
 from app.config import PROCESSING_DELAY_SECONDS, SWEEP_INTERVAL_SECONDS
@@ -26,6 +27,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Transaction Webhook Service", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def add_response_time(request: Request, call_next):
+    # Time spent inside the service, without network latency to the client.
+    started = time.perf_counter()
+    response = await call_next(request)
+    elapsed_ms = (time.perf_counter() - started) * 1000
+    response.headers["X-Response-Time-Ms"] = f"{elapsed_ms:.1f}"
+    return response
 
 
 @app.get("/")
