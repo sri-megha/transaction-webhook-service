@@ -2,7 +2,9 @@
 
 Receives transaction webhooks from a payment processor, acknowledges them right away, and processes them in the background (with a simulated 30s external call).
 
-**Live URL:** `<add after deploying>`
+**Live URL:** https://transaction-webhook-service-2w60.onrender.com
+
+(Free Render instance, so the first request after it has been idle can take ~30-50s while it wakes up.)
 
 ## Endpoints
 
@@ -49,6 +51,8 @@ curl localhost:8000/v1/transactions/txn_abc123def456
 ```
 
 Send the same POST a few times and you will still have only one transaction, processed once.
+
+Against the deployed service, replace `localhost:8000` with the live URL. Every response has an `X-Response-Time-Ms` header with the time spent inside the service, which is separate from network latency to the client. On the deployed instance the webhook takes about 215ms server-side.
 
 ## How it works
 
